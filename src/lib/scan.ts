@@ -1,7 +1,8 @@
 import type { Product, ScanResult } from "./types";
 
+// A browser-like UA: Shopify's edge rejects many bot UAs coming from cloud IPs.
 const UA =
-  "Mozilla/5.0 (compatible; CavacoPlaybookBot/1.0; +https://www.cavaco.ai/tools/marketing-playbook)";
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0 Safari/537.36 CavacoPlaybook/1.0";
 
 export function normalizeUrl(input: string): URL | null {
   let s = (input || "").trim();
@@ -17,17 +18,35 @@ export function normalizeUrl(input: string): URL | null {
   }
 }
 
+// Per-request fetch diagnostics (path → status or error), returned with the scan for debugging.
+export type FetchDiag = Record<string, string>;
+let diag: FetchDiag = {};
+
 async function fetchWithTimeout(url: string, ms: number, accept = "*/*"): Promise<Response | null> {
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), ms);
+  const key = (() => {
+    try {
+      const u = new URL(url);
+      return u.pathname + (u.search.includes("page=") ? u.search.replace(/.*(page=\d+).*/, "?$1") : "");
+    } catch {
+      return url;
+    }
+  })();
   try {
     const res = await fetch(url, {
       signal: ctrl.signal,
       redirect: "follow",
-      headers: { "user-agent": UA, accept },
+      headers: {
+        "user-agent": UA,
+        accept,
+        "accept-language": "en-US,en;q=0.9",
+      },
     });
+    diag[key] = String(res.status);
     return res;
-  } catch {
+  } catch (e) {
+    diag[key] = "error: " + String(e).slice(0, 120);
     return null;
   } finally {
     clearTimeout(t);
@@ -157,6 +176,7 @@ function pct(sorted: number[], q: number): number {
 
 export async function scanStore(input: string, budgetMs = 9000): Promise<ScanResult> {
   const t0 = Date.now();
+  diag = {};
   const u = normalizeUrl(input);
   if (!u) throw new Error("invalid_url");
   const origin = `https://${u.hostname}`;
@@ -252,5 +272,6 @@ export async function scanStore(input: string, budgetMs = 9000): Promise<ScanRes
     collections: (cols?.collections || []).map((c) => decodeEntities(c.title)).slice(0, 200),
     notes,
     ms: Date.now() - t0,
+    diag: { ...diag },
   };
 }

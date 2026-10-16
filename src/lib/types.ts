@@ -39,6 +39,7 @@ export interface ScanResult {
   collections: string[];
   notes: string[];
   ms: number;
+  diag?: Record<string, string>;
 }
 
 export interface SegmentValue {
