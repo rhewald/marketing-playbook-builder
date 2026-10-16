@@ -10,29 +10,40 @@ export async function aiJson<T>(env: AppEnv, system: string, user: string, timeo
   const url = `${ep.replace(/\/+$/, "")}/openai/deployments/${encodeURIComponent(dep)}/chat/completions?api-version=${ver}`;
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), timeoutMs);
+  const messages = [
+    { role: "system", content: system },
+    { role: "user", content: user },
+  ];
+  // Classic chat models accept temperature/max_tokens; reasoning models (o-series, gpt-5)
+  // reject them and need max_completion_tokens. Try the first, fall back to the second.
+  const bodies = [
+    { messages, response_format: { type: "json_object" }, temperature: 0.4, max_tokens: 1400 },
+    { messages, response_format: { type: "json_object" }, max_completion_tokens: 6000 },
+  ];
   try {
-    const res = await fetch(url, {
-      method: "POST",
-      signal: ctrl.signal,
-      headers: { "content-type": "application/json", "api-key": key },
-      body: JSON.stringify({
-        messages: [
-          { role: "system", content: system },
-          { role: "user", content: user },
-        ],
-        response_format: { type: "json_object" },
-        temperature: 0.4,
-        max_tokens: 1400,
-      }),
-    });
-    if (!res.ok) {
-      console.log("ai_error", res.status, (await res.text()).slice(0, 300));
-      return null;
+    for (const body of bodies) {
+      const res = await fetch(url, {
+        method: "POST",
+        signal: ctrl.signal,
+        headers: { "content-type": "application/json", "api-key": key },
+        body: JSON.stringify(body),
+      });
+      if (res.status === 400) {
+        const txt = await res.text();
+        if (/unsupported|not supported|max_completion_tokens|temperature/i.test(txt)) continue;
+        console.log("ai_error", 400, txt.slice(0, 300));
+        return null;
+      }
+      if (!res.ok) {
+        console.log("ai_error", res.status, (await res.text()).slice(0, 300));
+        return null;
+      }
+      const data = (await res.json()) as { choices?: { message?: { content?: string } }[] };
+      const content = data.choices?.[0]?.message?.content;
+      if (!content) return null;
+      return JSON.parse(content) as T;
     }
-    const data = (await res.json()) as { choices?: { message?: { content?: string } }[] };
-    const content = data.choices?.[0]?.message?.content;
-    if (!content) return null;
-    return JSON.parse(content) as T;
+    return null;
   } catch (e) {
     console.log("ai_exception", String(e).slice(0, 200));
     return null;
