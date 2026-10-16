@@ -40,6 +40,7 @@ export default async function PlaybookPage({ params }: { params: Promise<{ id: s
   const m = p.month;
   const ch = m.channels;
   const isLifecycle = p.segment.name === "Customer stage";
+  const none = s.homepageRead === false ? "couldn't check" : "none found";
   const platformLabel = s.platform === "shopify" ? "Shopify" : s.platform === "bigcommerce" ? "BigCommerce" : "Website";
   const ctaLabel = s.platform === "shopify" ? "Open in Cavaco (Shopify app)" : s.platform === "bigcommerce" ? "Open in Cavaco (BigCommerce app)" : "Book a Cavaco demo";
 
@@ -79,10 +80,10 @@ export default async function PlaybookPage({ params }: { params: Promise<{ id: s
             </div>
             <div className="grow stack gap-8">
               <span className="k">Channels found</span>
-              <Line label="Email" value={s.tools.email || "none found"} prov="AUTO" />
-              <Line label="SMS" value={s.tools.sms || "none found"} prov="AUTO" />
-              <Line label="Ads" value={s.tools.ads.join(", ") || "none found"} prov="AUTO" />
-              <Line label="Social" value={s.social.join(", ") || "none found"} prov="AUTO" />
+              <Line label="Email" value={s.tools.email || none} prov="AUTO" />
+              <Line label="SMS" value={s.tools.sms || none} prov="AUTO" />
+              <Line label="Ads" value={s.tools.ads.join(", ") || none} prov="AUTO" />
+              <Line label="Social" value={s.social.join(", ") || none} prov="AUTO" />
             </div>
             <div className="grow stack gap-8">
               <span className="k">Your answers</span>
@@ -268,7 +269,7 @@ export default async function PlaybookPage({ params }: { params: Promise<{ id: s
             <div className="card stack gap-12" style={{ flex: "1 1 360px" }}>
               <div className="row between center gap-8"><h4 style={{ fontSize: 17 }}>Social</h4><Tag p="AI" /></div>
               {ch.social.gap ? (
-                <span style={{ fontSize: 14, color: "var(--warn)" }}>We didn&apos;t find social links on your site. Add the platforms you use and we&apos;ll plan them.</span>
+                <span style={{ fontSize: 14, color: "var(--warn)" }}>{s.homepageRead === false ? "We couldn't check your social links." : "We didn't find social links on your site."} Add the platforms you use and we&apos;ll plan them.</span>
               ) : (
                 <>
                   <span className="mono" style={{ fontSize: 20 }}>{ch.social.posts} posts</span>
