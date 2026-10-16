@@ -138,7 +138,8 @@ function toProduct(p: ShopifyProduct, origin: string): Product {
     id: String(p.id),
     title: decodeEntities(p.title || ""),
     handle: p.handle,
-    type: p.product_type || "",
+    // Some stores use breadcrumb types ("Discipline > Boxing > Gloves"); keep the last part.
+    type: (p.product_type || "").split(">").pop()!.trim(),
     vendor: p.vendor || "",
     tags,
     options: (p.options || []).map((o) => ({ name: o.name, values: o.values || [] })),

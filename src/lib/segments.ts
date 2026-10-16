@@ -13,6 +13,7 @@ const DICTIONARY: Record<string, Record<string, string[]>> = {
     Karate: ["karate"],
     Taekwondo: ["taekwondo", "tkd"],
     Judo: ["judo"],
+    "Krav Maga": ["krav maga", "krav"],
   },
   "Scent family": {
     "Woody & smoky": ["wood", "cedar", "sandalwood", "smok", "oud", "amber", "pine", "leather", "tobacco", "fir", "campfire"],
