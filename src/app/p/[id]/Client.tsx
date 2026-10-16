@@ -51,7 +51,7 @@ export function LeadGate({ playbookId, month }: { playbookId: string; month: str
     e.preventDefault();
     setState("sending");
     try {
-      const res = await fetch(`${BASE}/api/lead`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ playbookId, email, role }) });
+      const res = await fetch(`${BASE}/api/lead`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ playbookId, email, role, hutk: document.cookie.match(/(?:^|; )hubspotutk=([^;]+)/)?.[1] ?? null }) });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
         setMsg(d.error === "invalid_email" ? "Please enter a valid work email." : "Something went wrong. Please try again.");

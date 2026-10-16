@@ -7,6 +7,8 @@ export interface AppEnv {
   AZURE_OPENAI_DEPLOYMENT?: string;
   AZURE_OPENAI_API_VERSION?: string;
   LEAD_WEBHOOK_URL?: string;
+  HUBSPOT_PORTAL_ID?: string;
+  HUBSPOT_FORM_ID?: string;
 }
 
 export interface D1Like {
@@ -35,5 +37,7 @@ export async function getEnv(): Promise<AppEnv> {
     AZURE_OPENAI_DEPLOYMENT: pick("AZURE_OPENAI_DEPLOYMENT"),
     AZURE_OPENAI_API_VERSION: pick("AZURE_OPENAI_API_VERSION"),
     LEAD_WEBHOOK_URL: pick("LEAD_WEBHOOK_URL"),
+    HUBSPOT_PORTAL_ID: pick("HUBSPOT_PORTAL_ID"),
+    HUBSPOT_FORM_ID: pick("HUBSPOT_FORM_ID"),
   };
 }
