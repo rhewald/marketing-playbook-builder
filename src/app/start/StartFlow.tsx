@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { BASE } from "@/lib/base";
+import { collectInBrowser } from "@/lib/clientScan";
 import type { Answers, ScanResult, SegmentCandidate } from "@/lib/types";
 import { ToolBar } from "@/components/SiteChrome";
 
@@ -82,7 +83,9 @@ export default function StartFlow() {
     }
     (async () => {
       try {
-        const res = await fetch(`${BASE}/api/scan`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ url }) });
+        // Read the product feed from the browser first (Shopify throttles server IPs).
+        const client = await collectInBrowser(url).catch(() => null);
+        const res = await fetch(`${BASE}/api/scan`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ url, client }) });
         const data = await res.json();
         if (!res.ok) {
           setError(
@@ -221,7 +224,7 @@ export default function StartFlow() {
     const val = Array.isArray(v) ? v.join(", ") : v;
     return (
       <div className="row between gap-8" style={{ fontSize: 14 }}>
-        <span>{label}: {val || "none found"}</span>
+        <span>{label}: {val || (s.homepageRead === false ? "couldn't check" : "none found")}</span>
         <span className="tag t-AUTO">AUTO</span>
       </div>
     );
