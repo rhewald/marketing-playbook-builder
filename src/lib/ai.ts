@@ -7,7 +7,14 @@ export async function aiJson<T>(env: AppEnv, system: string, user: string, timeo
   const { AZURE_OPENAI_ENDPOINT: ep, AZURE_OPENAI_API_KEY: key, AZURE_OPENAI_DEPLOYMENT: dep } = env;
   if (!ep || !key || !dep) return null;
   const ver = env.AZURE_OPENAI_API_VERSION || "2024-10-21";
-  const url = `${ep.replace(/\/+$/, "")}/openai/deployments/${encodeURIComponent(dep)}/chat/completions?api-version=${ver}`;
+  // Accept either the bare resource URL or a full "Target URI" pasted from Azure; keep only the origin.
+  let base = ep.trim().replace(/\/+$/, "");
+  try {
+    base = new URL(base).origin;
+  } catch {
+    /* keep as is */
+  }
+  const url = `${base}/openai/deployments/${encodeURIComponent(dep)}/chat/completions?api-version=${ver}`;
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), timeoutMs);
   const messages = [
