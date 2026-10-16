@@ -21,6 +21,7 @@ export interface ScanResult {
   description: string;
   platform: "shopify" | "bigcommerce" | "other" | "unknown";
   reachable: boolean;
+  homepageRead?: boolean;
   productCount: number;
   productCountCapped: boolean;
   priceRange: [number, number] | null;
@@ -120,6 +121,7 @@ export interface Playbook {
     categories: string[];
     tools: ScanResult["tools"];
     social: string[];
+    homepageRead?: boolean;
     voice: string | null;
   };
   answers: Answers;

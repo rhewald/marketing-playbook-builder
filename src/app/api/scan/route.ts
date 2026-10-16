@@ -5,13 +5,14 @@ import { aiConfigured, refineSegments } from "@/lib/ai";
 import { logEvent, overLimit } from "@/lib/db";
 import { clientIp, json } from "@/lib/http";
 import type { SegmentCandidate } from "@/lib/types";
+import type { ClientScanData } from "@/lib/clientScan";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   const t0 = Date.now();
   const ip = clientIp(req);
-  let body: { url?: string } = {};
+  let body: { url?: string; client?: ClientScanData | null } = {};
   try {
     body = await req.json();
   } catch {
@@ -22,7 +23,8 @@ export async function POST(req: Request) {
 
   let scan;
   try {
-    scan = await scanStore(body.url || "", 9000);
+    const client = body.client && Array.isArray(body.client.products) ? { ...body.client, products: body.client.products.slice(0, 1000) } : null;
+    scan = await scanStore(body.url || "", 9000, client);
   } catch (e) {
     if (String(e).includes("invalid_url")) return json({ error: "invalid_url" }, 400);
     return json({ error: "scan_failed" }, 502);

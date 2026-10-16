@@ -1,4 +1,5 @@
 import type { Product, ScanResult } from "./types";
+import type { ClientScanData } from "./clientScan";
 
 // A browser-like UA: Shopify's edge rejects many bot UAs coming from cloud IPs.
 const UA =
@@ -174,24 +175,36 @@ function pct(sorted: number[], q: number): number {
   return sorted[i];
 }
 
-export async function scanStore(input: string, budgetMs = 9000): Promise<ScanResult> {
+export async function scanStore(input: string, budgetMs = 9000, client: ClientScanData | null = null): Promise<ScanResult> {
   const t0 = Date.now();
   diag = {};
   const u = normalizeUrl(input);
   if (!u) throw new Error("invalid_url");
-  const origin = `https://${u.hostname}`;
+  let origin = `https://${u.hostname}`;
+  if (client?.origin) {
+    try {
+      const co = new URL(client.origin);
+      // Only trust the browser's origin if it is the same store (allow www/apex redirects).
+      if (co.hostname.replace(/^www\./, "") === u.hostname.replace(/^www\./, "")) origin = co.origin;
+    } catch {
+      /* ignore */
+    }
+  }
   const notes: string[] = [];
+  const hasClient = !!client && Array.isArray(client.products) && client.products.length > 0;
 
   const per = Math.min(7000, budgetMs);
   const [home, page1, cols] = await Promise.all([
     fetchText(origin + "/", per),
-    fetchJson<{ products: ShopifyProduct[] }>(`${origin}/products.json?limit=250&page=1`, per),
-    fetchJson<{ collections: { title: string; products_count?: number }[] }>(`${origin}/collections.json?limit=250`, per),
+    hasClient ? Promise.resolve({ products: client!.products as ShopifyProduct[] }) : fetchJson<{ products: ShopifyProduct[] }>(`${origin}/products.json?limit=250&page=1`, per),
+    hasClient
+      ? Promise.resolve({ collections: (client!.collections || []).map((title) => ({ title: String(title) })) })
+      : fetchJson<{ collections: { title: string; products_count?: number }[] }>(`${origin}/collections.json?limit=250`, per),
   ]);
 
-  let raw: ShopifyProduct[] = page1?.products ?? [];
-  let capped = false;
-  if (raw.length === 250 && Date.now() - t0 < budgetMs - 3000) {
+  let raw: ShopifyProduct[] = (page1?.products ?? []).slice(0, 1000);
+  let capped = hasClient && raw.length >= 1000;
+  if (!hasClient && raw.length === 250 && Date.now() - t0 < budgetMs - 3000) {
     const more = await Promise.all(
       [2, 3, 4].map((n) =>
         fetchJson<{ products: ShopifyProduct[] }>(`${origin}/products.json?limit=250&page=${n}`, Math.max(2000, budgetMs - (Date.now() - t0) - 500))
@@ -199,7 +212,7 @@ export async function scanStore(input: string, budgetMs = 9000): Promise<ScanRes
     );
     for (const m of more) if (m?.products?.length) raw = raw.concat(m.products);
     if (raw.length >= 1000) capped = true;
-  } else if (raw.length === 250) {
+  } else if (!hasClient && raw.length === 250) {
     capped = true;
   }
 
@@ -212,6 +225,7 @@ export async function scanStore(input: string, budgetMs = 9000): Promise<ScanRes
   else if (html) platform = "other";
 
   if (!home && !page1) notes.push("We couldn't reach this site. It may block automated visits or be password protected.");
+  if (!home && page1) notes.push("We couldn't read your homepage, so marketing tools and social links may be missing.");
   if (platform === "shopify" && !page1) notes.push("This store hides its product feed, so we used the homepage only.");
   if (platform === "bigcommerce") notes.push("BigCommerce stores don't share a public product feed, so we read the homepage only.");
   if (/password|opening soon/i.test(meta(html, "og:title")) || /<form[^>]+action=["'][^"']*\/password/i.test(html))
@@ -243,6 +257,7 @@ export async function scanStore(input: string, budgetMs = 9000): Promise<ScanRes
 
   const name =
     meta(html, "og:site_name") ||
+    (client?.meta?.name ? decodeEntities(client.meta.name) : "") ||
     decodeEntities((html.match(/<title[^>]*>([^<]*)<\/title>/i)?.[1] || "").split(/[|–—-]/)[0].trim()) ||
     u.hostname.replace(/^www\./, "");
 
@@ -250,6 +265,7 @@ export async function scanStore(input: string, budgetMs = 9000): Promise<ScanRes
     html.match(/Shopify\.currency\s*=\s*\{[^}]*"active"\s*:\s*"([A-Z]{3})"/)?.[1] ||
     html.match(/"currency(?:Code)?"\s*:\s*"([A-Z]{3})"/)?.[1] ||
     meta(html, "og:price:currency") ||
+    (client?.meta?.currency && /^[A-Z]{3}$/.test(client.meta.currency) ? client.meta.currency : "") ||
     "USD";
 
   return {
@@ -257,9 +273,10 @@ export async function scanStore(input: string, budgetMs = 9000): Promise<ScanRes
     origin,
     host: u.hostname.replace(/^www\./, ""),
     name,
-    description: meta(html, "description") || meta(html, "og:description"),
+    description: meta(html, "description") || meta(html, "og:description") || decodeEntities(client?.meta?.description || "").slice(0, 400),
     platform,
     reachable: !!(home || page1),
+    homepageRead: !!home,
     productCount: products.length,
     productCountCapped: capped,
     priceRange,
