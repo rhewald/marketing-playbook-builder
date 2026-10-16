@@ -82,7 +82,7 @@ function heroFor(products: Product[]): Product | null {
   return priced[Math.min(priced.length - 1, Math.floor(priced.length * 0.7))];
 }
 
-function finalize(name: string, source: string, groups: Map<string, Product[]>, total: number, weight: number): SegmentCandidate | null {
+function finalize(name: string, source: string, groups: Map<string, Product[]>, total: number, weight: number, heroPools?: Map<string, Product[]>): SegmentCandidate | null {
   const minCount = Math.max(2, Math.ceil(total * 0.03));
   const kept = [...groups.entries()].filter(([, ps]) => ps.length >= minCount).sort((a, b) => b[1].length - a[1].length);
   if (kept.length < 2) return null;
@@ -96,7 +96,8 @@ function finalize(name: string, source: string, groups: Map<string, Product[]>, 
   const countFactor = n >= 3 && n <= 6 ? 1 : n === 2 ? 0.75 : 0.85;
   const score = coverage * balance * countFactor * weight;
   const values: SegmentValue[] = top.map(([v, ps]) => {
-    const h = heroFor(ps);
+    const pool = heroPools?.get(v);
+    const h = heroFor(pool && pool.length ? pool : ps);
     return { name: v, productCount: ps.length, heroProduct: h?.title ?? null, heroUrl: h?.url ?? null };
   });
   return { name, source, coverage, score, values };
@@ -115,12 +116,20 @@ export function detectSegments(scan: ScanResult): SegmentCandidate[] {
     const texts = products.map((p) => ({ p, t: " " + textOf(p) + " " }));
     for (const [dim, values] of Object.entries(DICTIONARY)) {
       const groups = new Map<string, Product[]>();
-      for (const [val, kws] of Object.entries(values)) {
-        const re = new RegExp(`(^|[^a-z])(${kws.map(escapeRe).join("|")})`, "i");
+      const res = Object.entries(values).map(([val, kws]) => [val, new RegExp(`(^|[^a-z])(${kws.map(escapeRe).join("|")})`, "i")] as const);
+      for (const [val, re] of res) {
         const ps = texts.filter((x) => re.test(x.t)).map((x) => x.p);
         if (ps.length) groups.set(val, ps);
       }
-      const c = finalize(dim, "product names and tags", groups, total, 1.0);
+      // Hero products: prefer ones whose title names this value and no other
+      // (a "Muay Thai & Boxing" pad shouldn't be the MMA hero).
+      const heroPools = new Map<string, Product[]>();
+      for (const [val, re] of res) {
+        const inTitle = (groups.get(val) || []).filter((p) => re.test(" " + p.title.toLowerCase() + " "));
+        const only = inTitle.filter((p) => res.every(([v2, re2]) => v2 === val || !re2.test(" " + p.title.toLowerCase() + " ")));
+        heroPools.set(val, only.length ? only : inTitle);
+      }
+      const c = finalize(dim, "product names and tags", groups, total, 1.0, heroPools);
       if (c) out.push(c);
     }
 

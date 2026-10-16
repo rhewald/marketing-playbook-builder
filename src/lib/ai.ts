@@ -92,7 +92,7 @@ export async function playbookCopy(
   timeoutMs: number
 ): Promise<AiCopy | null> {
   const system =
-    "You are a senior DTC marketing strategist writing a client-ready marketing playbook. Be specific to this store. Never invent discounts, prices, revenue numbers or products. Only mention products from the provided list. Keep every string short (under 90 characters). Answer in JSON only.";
+    "You are a senior DTC marketing strategist writing a client-ready marketing playbook. Be specific to this store. Never invent discounts, prices, revenue numbers, founding dates, awards or products; only state facts present in the input. Only mention products from the provided list. Keep every string short (under 90 characters). Answer in JSON only.";
   const user = JSON.stringify({
     store: { name: scan.name, description: scan.description, categories: scan.categories, newArrivals: scan.newArrivals },
     products: scan.products.slice(0, 60).map((p) => p.title),
@@ -105,7 +105,7 @@ export async function playbookCopy(
       voice: "3-5 words describing the brand voice",
       quarterThemes: "array, one short evocative theme per quarter, in order",
       messages: "array of 2-3 key messages for the month (no discounts unless the offer was given)",
-      supporting: "{name, detail} supporting campaign for the month",
+      supporting: "{name, detail} a supporting campaign that is different from the main moment (e.g. a guide series, new arrivals, or community content); do not reuse the main moment name",
       segmentAngles: "object mapping each segment value name to a one-line angle for the month",
       priorityProducts: "array of up to 3 product titles from the list to push this month",
       adAngles: "array of 3 short ad angles",
