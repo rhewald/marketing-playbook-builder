@@ -186,6 +186,8 @@ export function generatePlaybook(
   const cap = discountCap(answers);
 
   const tools = scan.tools;
+  // If we couldn't read the homepage we don't know which tools/socials they use; don't claim gaps.
+  const known = scan.homepageRead !== false;
   const hasSms = !!tools.sms;
   const emails = isMajor ? 12 : 9;
   const sms = hasSms ? Math.round(emails / 3) : 0;
@@ -253,8 +255,8 @@ export function generatePlaybook(
     { label: "Repeat purchase rate", value: "[Set]", provenance: "ADD" },
   ];
   const gaps: string[] = [];
-  if (!tools.sms) gaps.push("SMS");
-  if (!tools.email) gaps.push("email automation");
+  if (known && !tools.sms) gaps.push("SMS");
+  if (known && !tools.email) gaps.push("email automation");
   if (budget === 0) gaps.push("paid ads");
   if (gaps.length) targets.push({ label: "Biggest channel gap", value: `Add ${gaps[0]}`, provenance: "AI" });
 
@@ -277,6 +279,7 @@ export function generatePlaybook(
       categories: scan.categories,
       tools: scan.tools,
       social: scan.social,
+      homepageRead: known,
       voice: ai?.voice || null,
     },
     answers,
@@ -331,7 +334,7 @@ export function generatePlaybook(
         emailSms: {
           emails,
           sms,
-          smsGap: !hasSms,
+          smsGap: known && !hasSms,
           mix: isMajor ? { promotional: 55, helpful: 30, relational: 15 } : { promotional: 45, helpful: 35, relational: 20 },
           groups: [
             { name: "VIPs", who: "Top 20% by lifetime spend", gets: discountMonth ? "Early access before everyone else" : "First look at new products" },
