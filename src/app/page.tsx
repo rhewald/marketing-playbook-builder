@@ -85,7 +85,7 @@ export default function Landing() {
     <main>
       <section className="wrap hero row gap-40 center" aria-labelledby="h-hero">
         <div className="stack gap-16" style={{ flex: "1 1 460px" }}>
-          <span className="eyebrow">MARKETING PLAYBOOK BUILDER · FREE FOR SHOPIFY AND BIGCOMMERCE</span>
+          <span className="eyebrow">MARKETING PLAYBOOK BUILDER · FREE FOR ANY ONLINE STORE</span>
           <h1 id="h-hero">Your next 12 months of marketing strategy, in 2 minutes</h1>
           <p className="lead">
             Paste your store. Answer 6 questions. Get a playbook: the strategy for your year and a detailed plan for this month across email, SMS, social, ads and your site.
@@ -141,8 +141,9 @@ export default function Landing() {
       <section className="wrap pad stack gap-16" aria-labelledby="h-faq" style={{ maxWidth: 880 }}>
         <h2 id="h-faq" style={{ fontSize: 32 }}>Questions</h2>
         {[
-          ["Is it really free?", "Yes. The playbook is yours to keep. We ask for an email only to send the download and next month's playbook."],
+          ["Is it really free?", "Yes. The playbook is yours to keep. We ask for your email to unlock the download. Fresh playbooks every month, and the work built for you, come with Cavaco."],
           ["What do you do with my store?", "We read public pages only: products, prices and which tools are installed. We never log in or change anything."],
+          ["Does it work if I'm not on Shopify?", "Yes. It reads Shopify, WooCommerce, BigCommerce, Squarespace, Wix, Adobe Commerce and most other stores from their public product pages."],
           ["Do I need Cavaco to use the playbook?", "No. Use it with any tools. If you want the emails, posts and ads made for you, Cavaco can build them from your playbook."],
         ].map(([q, a]) => (
           <div key={q} className="stack gap-4" style={{ paddingBottom: 16, borderBottom: "1px solid var(--line)" }}>

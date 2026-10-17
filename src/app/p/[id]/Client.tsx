@@ -69,7 +69,7 @@ export function LeadGate({ playbookId, month }: { playbookId: string; month: str
     return (
       <div className="stack gap-12">
         <h2 style={{ fontSize: 20 }}>Your playbook is unlocked</h2>
-        <p className="muted">Download it now. We&apos;ll email your next month&apos;s playbook at the start of {month === "" ? "next month" : "the month"}.</p>
+        <p className="muted">Download it below. Want a fresh playbook every month, with the emails, posts, ads and site changes built for you? That&apos;s what Cavaco does, starting with a 14-day free trial.</p>
         <div className="row gap-8">
           <a className="btn btn-primary" href={`${BASE}/api/p/${playbookId}/csv`} onClick={() => track(playbookId, "csv")}>Download spreadsheet (CSV)</a>
           <button type="button" className="btn btn-light" onClick={() => { track(playbookId, "print"); window.print(); }}>Save as PDF</button>
@@ -80,8 +80,8 @@ export function LeadGate({ playbookId, month }: { playbookId: string; month: str
   return (
     <form onSubmit={submit} className="row gap-24 between" style={{ alignItems: "flex-end" }}>
       <div className="stack gap-4" style={{ flex: "1 1 320px" }}>
-        <h2 style={{ fontSize: 20 }}>Get the full playbook and next month&apos;s update</h2>
-        <p className="quiet" style={{ fontSize: 14 }}>Spreadsheet and PDF now; your next month&apos;s playbook by email.</p>
+        <h2 style={{ fontSize: 20 }}>Download your playbook</h2>
+        <p className="quiet" style={{ fontSize: 14 }}>Get the spreadsheet and PDF. A new playbook every month comes with Cavaco.</p>
       </div>
       <div className="row gap-8" style={{ flex: "2 1 480px", alignItems: "flex-end" }}>
         <label className="field" style={{ flex: "2 1 220px" }}>

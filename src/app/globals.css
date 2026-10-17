@@ -140,7 +140,9 @@ table.t td { padding: 10px 12px; border-bottom: 1px solid var(--line-soft); vert
 .cta-band .sub { color: #d5dae2; }
 .legend { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 13px; color: var(--quiet); }
 
+.print-only { display: none; }
 @media print {
+  .print-only { display: block; }
   .site-header, .site-footer, .toolbar, .no-print { display: none !important; }
   body { background: #fff; }
   .card { break-inside: avoid; }
