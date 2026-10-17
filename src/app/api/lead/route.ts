@@ -45,6 +45,7 @@ export async function POST(req: Request) {
     fitScore: score,
     storeUrl: p.store.url,
     platform: p.store.platform,
+    emailTool: p.store.tools.email,
     revenueBand: p.answers.revenueBand,
     adBudget: p.answers.adBudget,
     segment: p.segment.name,
