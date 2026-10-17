@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { BASE } from "@/lib/base";
 import { collectInBrowser } from "@/lib/clientScan";
+import { platformLabel } from "@/lib/platform";
 import type { Answers, ScanResult, SegmentCandidate } from "@/lib/types";
 import { ToolBar } from "@/components/SiteChrome";
 
@@ -239,7 +240,7 @@ export default function StartFlow() {
           <span className="quiet" style={{ fontSize: 14 }}>{s.name} · {s.host}</span>
           <div className="stack gap-8">
             <div className="row between gap-8" style={{ fontSize: 14 }}>
-              <span>{s.platform === "shopify" ? "Shopify" : s.platform === "bigcommerce" ? "BigCommerce" : "Website"}{s.productCount ? ` · ${s.productCount}${s.productCountCapped ? "+" : ""} products` : ""}</span>
+              <span>{platformLabel(s.platform)}{s.productCount ? ` · ${s.productCount}${s.productCountCapped ? "+" : ""} products` : ""}</span>
               <span className="tag t-AUTO">AUTO</span>
             </div>
             {s.categories.length ? (

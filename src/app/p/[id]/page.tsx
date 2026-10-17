@@ -4,6 +4,7 @@ import { getPlaybook } from "@/lib/db";
 import { fmt, fmtRange } from "@/lib/calendar";
 import { money } from "@/lib/rules";
 import { BASE } from "@/lib/base";
+import { platformLabel as labelFor } from "@/lib/platform";
 import { ToolBar } from "@/components/SiteChrome";
 import type { Provenance } from "@/lib/types";
 import { CtaButton, LeadGate, ShareButton } from "./Client";
@@ -41,7 +42,7 @@ export default async function PlaybookPage({ params }: { params: Promise<{ id: s
   const ch = m.channels;
   const isLifecycle = p.segment.name === "Customer stage";
   const none = s.homepageRead === false ? "couldn't check" : "none found";
-  const platformLabel = s.platform === "shopify" ? "Shopify" : s.platform === "bigcommerce" ? "BigCommerce" : "Website";
+  const platformLabel = labelFor(s.platform);
   const ctaLabel = s.platform === "shopify" ? "Open in Cavaco (Shopify app)" : s.platform === "bigcommerce" ? "Open in Cavaco (BigCommerce app)" : "Book a Cavaco demo";
 
   return (
@@ -55,6 +56,7 @@ export default async function PlaybookPage({ params }: { params: Promise<{ id: s
       </ToolBar>
 
       <main className="wrap pb stack gap-40" style={{ padding: "32px 24px" }}>
+        <p className="print-only quiet" style={{ fontSize: 12 }}>Made with the free Marketing Playbook Builder by Cavaco · cavaco.ai/tools/marketing-playbook</p>
         {/* Store */}
         <section className="stack gap-16" aria-labelledby="h-store">
           <div className="row between gap-12" style={{ alignItems: "flex-end" }}>
@@ -347,7 +349,7 @@ export default async function PlaybookPage({ params }: { params: Promise<{ id: s
           </div>
           <div className="stack gap-8" style={{ flex: "0 1 340px" }}>
             <CtaButton playbookId={p.id} href={p.cta.url} label={ctaLabel} />
-            <span style={{ fontSize: 13, color: "#b9c0cc", textAlign: "center" }}>14-day free trial</span>
+            <span style={{ fontSize: 13, color: "#b9c0cc", textAlign: "center" }}>14-day free trial with every new account</span>
           </div>
         </section>
 
