@@ -1,5 +1,6 @@
 import type { Product, ScanResult } from "./types";
 import type { ClientScanData } from "./clientScan";
+import { readCatalog } from "./catalog";
 
 // A browser-like UA: Shopify's edge rejects many bot UAs coming from cloud IPs.
 const UA =
@@ -88,6 +89,7 @@ interface ShopifyProduct {
   variants?: { price: string; available?: boolean }[];
   created_at?: string;
   published_at?: string;
+  url?: string;
 }
 
 const TOOL_SIGNATURES: { kind: keyof ScanResult["tools"]; name: string; re: RegExp }[] = [
@@ -165,8 +167,25 @@ function toProduct(p: ShopifyProduct, origin: string): Product {
     options: (p.options || []).map((o) => ({ name: o.name, values: o.values || [] })),
     price: prices.length ? Math.min(...prices) : 0,
     createdAt: p.published_at || p.created_at || "",
-    url: `${origin}/products/${p.handle}`,
+    url: p.url || `${origin}/products/${p.handle}`,
   };
+}
+
+const PLATFORMS: { id: ScanResult["platform"]; re: RegExp }[] = [
+  { id: "shopify", re: /cdn\.shopify\.com|shopify\.theme|myshopify\.com|shopify-section/i },
+  { id: "bigcommerce", re: /cdn\d*\.bigcommerce\.com|stencil-utils|bigcommerce/i },
+  { id: "woocommerce", re: /wp-content\/plugins\/woocommerce|woocommerce/i },
+  { id: "squarespace", re: /static1\.squarespace\.com|squarespace-cdn|Static\.SQUARESPACE_CONTEXT/i },
+  { id: "wix", re: /static\.wixstatic\.com|wix-bolt|_wixCIDX|wix\.com\/website/i },
+  { id: "ecwid", re: /app\.ecwid\.com|ecwid_script|Ecwid\./i },
+  { id: "magento", re: /Magento_|mage\/cookies|\/static\/version\d+\/frontend|data-mage-init/i },
+  { id: "salesforce", re: /demandware\.(static|store)|\/on\/demandware|dwanalytics/i },
+];
+
+function detectPlatform(html: string): ScanResult["platform"] {
+  if (!html) return "unknown";
+  for (const p of PLATFORMS) if (p.re.test(html)) return p.id;
+  return "other";
 }
 
 function pct(sorted: number[], q: number): number {
@@ -217,17 +236,20 @@ export async function scanStore(input: string, budgetMs = 9000, client: ClientSc
   }
 
   const html = home?.text ?? "";
-  const lower = html.toLowerCase();
-  let platform: ScanResult["platform"] = "unknown";
-  if (page1) platform = "shopify";
-  else if (/cdn\.shopify\.com|shopify\.theme|myshopify\.com/.test(lower)) platform = "shopify";
-  else if (/bigcommerce|stencil-utils|cdn\d*\.bigcommerce\.com/.test(lower)) platform = "bigcommerce";
-  else if (html) platform = "other";
+  const platform: ScanResult["platform"] = page1 ? "shopify" : detectPlatform(html);
+
+  // Non-Shopify stores (or Shopify stores that hide their feed): read the catalog
+  // from the WooCommerce Store API or the sitemap + product pages.
+  let catalogCurrency = "";
+  if (!page1 && (home || platform !== "unknown")) {
+    const cat = await readCatalog(origin, platform, html, fetchWithTimeout, t0 + budgetMs);
+    if (cat.products.length) raw = cat.products as ShopifyProduct[];
+    catalogCurrency = cat.currency;
+  }
 
   if (!home && !page1) notes.push("We couldn't reach this site. It may block automated visits or be password protected.");
   if (!home && page1) notes.push("We couldn't read your homepage, so marketing tools and social links may be missing.");
-  if (platform === "shopify" && !page1) notes.push("This store hides its product feed, so we used the homepage only.");
-  if (platform === "bigcommerce") notes.push("BigCommerce stores don't share a public product feed, so we read the homepage only.");
+  if (home && !raw.length) notes.push("We couldn't find a product list on this site, so we suggest personalizing by customer stage.");
   if (/password|opening soon/i.test(meta(html, "og:title")) || /<form[^>]+action=["'][^"']*\/password/i.test(html))
     notes.push("This store looks password protected.");
 
@@ -265,6 +287,7 @@ export async function scanStore(input: string, budgetMs = 9000, client: ClientSc
     html.match(/Shopify\.currency\s*=\s*\{[^}]*"active"\s*:\s*"([A-Z]{3})"/)?.[1] ||
     html.match(/"currency(?:Code)?"\s*:\s*"([A-Z]{3})"/)?.[1] ||
     meta(html, "og:price:currency") ||
+    (/^[A-Z]{3}$/.test(catalogCurrency) ? catalogCurrency : "") ||
     (client?.meta?.currency && /^[A-Z]{3}$/.test(client.meta.currency) ? client.meta.currency : "") ||
     "USD";
 
