@@ -24,7 +24,7 @@ export async function POST(req: Request) {
   let scan;
   try {
     const client = body.client && Array.isArray(body.client.products) ? { ...body.client, products: body.client.products.slice(0, 1000) } : null;
-    scan = await scanStore(body.url || "", 9000, client);
+    scan = await scanStore(body.url || "", 12000, client);
   } catch (e) {
     if (String(e).includes("invalid_url")) return json({ error: "invalid_url" }, 400);
     return json({ error: "scan_failed" }, 502);
@@ -34,8 +34,8 @@ export async function POST(req: Request) {
   let segmentSource: "rules" | "ai" = "rules";
   const env = await getEnv();
   const elapsed = Date.now() - t0;
-  if (aiConfigured(env) && scan.products.length >= 4 && elapsed < 9000) {
-    const r = await refineSegments(env, scan, segments, Math.min(8000, 16500 - elapsed));
+  if (aiConfigured(env) && scan.products.length >= 4 && elapsed < 14000) {
+    const r = await refineSegments(env, scan, segments, Math.min(7000, 17500 - elapsed));
     if (r && typeof r.best === "number" && r.best >= 0 && r.best < segments.length) {
       const chosen = { ...segments[r.best] };
       if (r.name) chosen.name = r.name.slice(0, 40);

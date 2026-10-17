@@ -26,7 +26,7 @@ export function SiteFooter() {
   return (
     <footer className="site-footer">
       <div className="wrap bar">
-        <span>© {new Date().getFullYear()} Cavaco · 4000 Moorpark Ave, San Jose, CA</span>
+        <span>© {new Date().getFullYear()} Cavaco · 616 Ramona St, Palo Alto, CA 94301</span>
         <span>
           <a href={`${SITE}/pricing`}>Pricing</a>
           <a href="https://help.cavaco.ai">Help Center</a>

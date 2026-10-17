@@ -42,7 +42,7 @@ export async function sendToHubspot(env: AppEnv, lead: HubspotLead): Promise<{ o
     f("playbook_segment", lead.segment),
     f("playbook_url", lead.playbookUrl),
   ];
-  if (lead.platform === "shopify" || lead.platform === "bigcommerce") extra.push(f("cavaco_platform", lead.platform));
+  if (["shopify", "bigcommerce", "woocommerce"].includes(lead.platform)) extra.push(f("cavaco_platform", lead.platform));
   if (lead.emailTool) extra.push(f("current_email_platform", EMAIL_PLATFORMS.includes(lead.emailTool) ? lead.emailTool : "Other"));
   const context: Record<string, string> = { pageUri: lead.playbookUrl, pageName: "Marketing Playbook Builder" };
   if (lead.hutk && /^[a-f0-9]{32}$/i.test(lead.hutk)) context.hutk = lead.hutk;

@@ -109,3 +109,52 @@ export async function overLimit(name: string, ip: string, max: number): Promise<
     return false;
   }
 }
+
+export interface FunnelStats {
+  days: { day: string; counts: Record<string, number> }[];
+  totals: Record<string, number>;
+  leads: { total: number; avgFit: number | null; byRole: Record<string, number> };
+  platforms: Record<string, number>;
+}
+
+/** Aggregate funnel counts (no personal data). */
+export async function getStats(days = 14): Promise<FunnelStats> {
+  const { DB } = await getEnv();
+  const empty: FunnelStats = { days: [], totals: {}, leads: { total: 0, avgFit: null, byRole: {} }, platforms: {} };
+  if (!DB) return empty;
+  const since = new Date(Date.now() - days * 86400_000).toISOString();
+  const ev = await DB.prepare(
+    "SELECT substr(created_at, 1, 10) AS day, name, COUNT(*) AS n FROM events WHERE created_at > ? GROUP BY day, name ORDER BY day DESC"
+  )
+    .bind(since)
+    .all<{ day: string; name: string; n: number }>();
+  const byDay = new Map<string, Record<string, number>>();
+  const totals: Record<string, number> = {};
+  for (const r of ev.results) {
+    if (!byDay.has(r.day)) byDay.set(r.day, {});
+    byDay.get(r.day)![r.name] = r.n;
+    totals[r.name] = (totals[r.name] || 0) + r.n;
+  }
+  const leads = await DB.prepare("SELECT role, COUNT(*) AS n, AVG(fit_score) AS fit FROM leads WHERE created_at > ? GROUP BY role")
+    .bind(since)
+    .all<{ role: string; n: number; fit: number }>();
+  let total = 0;
+  let fitSum = 0;
+  const byRole: Record<string, number> = {};
+  for (const r of leads.results) {
+    total += r.n;
+    fitSum += (r.fit || 0) * r.n;
+    byRole[r.role || "other"] = r.n;
+  }
+  const plat = await DB.prepare("SELECT platform, COUNT(*) AS n FROM playbooks WHERE created_at > ? GROUP BY platform")
+    .bind(since)
+    .all<{ platform: string; n: number }>();
+  const platforms: Record<string, number> = {};
+  for (const r of plat.results) platforms[r.platform || "unknown"] = r.n;
+  return {
+    days: [...byDay.entries()].map(([day, counts]) => ({ day, counts })),
+    totals,
+    leads: { total, avgFit: total ? Math.round(fitSum / total) : null, byRole },
+    platforms,
+  };
+}

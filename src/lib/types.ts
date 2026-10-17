@@ -19,7 +19,7 @@ export interface ScanResult {
   host: string;
   name: string;
   description: string;
-  platform: "shopify" | "bigcommerce" | "other" | "unknown";
+  platform: "shopify" | "bigcommerce" | "woocommerce" | "squarespace" | "wix" | "ecwid" | "magento" | "salesforce" | "other" | "unknown";
   reachable: boolean;
   homepageRead?: boolean;
   productCount: number;
