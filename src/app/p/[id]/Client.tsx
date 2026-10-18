@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { BASE } from "@/lib/base";
+import { BASE, SITE } from "@/lib/base";
+import { isPersonalEmail, WORK_EMAIL_MESSAGE } from "@/lib/workEmail";
 
 function track(playbookId: string, event: string) {
   try {
@@ -49,12 +50,17 @@ export function LeadGate({ playbookId, month }: { playbookId: string; month: str
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (isPersonalEmail(email)) {
+      setMsg(WORK_EMAIL_MESSAGE);
+      setState("error");
+      return;
+    }
     setState("sending");
     try {
       const res = await fetch(`${BASE}/api/lead`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ playbookId, email, role, hutk: document.cookie.match(/(?:^|; )hubspotutk=([^;]+)/)?.[1] ?? null }) });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        setMsg(d.error === "invalid_email" ? "Please enter a valid work email." : "Something went wrong. Please try again.");
+        setMsg(d.error === "invalid_email" ? "Please enter a valid work email." : d.error === "personal_email" ? WORK_EMAIL_MESSAGE : "Something went wrong. Please try again.");
         setState("error");
         return;
       }
@@ -98,9 +104,13 @@ export function LeadGate({ playbookId, month }: { playbookId: string; month: str
             <option value="other">Other</option>
           </select>
         </label>
-        <button className="btn btn-primary" type="submit" disabled={state === "sending"}>{state === "sending" ? "Sending…" : "Send my playbook"}</button>
+        <button className="btn btn-primary" type="submit" disabled={state === "sending"}>{state === "sending" ? "Unlocking…" : "Get my playbook"}</button>
       </div>
       {state === "error" ? <p className="error" role="alert" style={{ width: "100%" }}>{msg}</p> : null}
+      <p className="quiet" style={{ width: "100%", fontSize: 13 }}>
+        By continuing you agree that Cavaco may email you about your playbook and Cavaco. Unsubscribe anytime. See our{" "}
+        <a href={`${SITE}/privacy-policy`} target="_blank" rel="noopener">Privacy Policy</a>.
+      </p>
     </form>
   );
 }

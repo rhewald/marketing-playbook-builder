@@ -3,6 +3,7 @@ import { fitScore } from "@/lib/score";
 import { getEnv } from "@/lib/env";
 import { clientIp, json } from "@/lib/http";
 import { sendToHubspot } from "@/lib/hubspot";
+import { isPersonalEmail } from "@/lib/workEmail";
 
 export const dynamic = "force-dynamic";
 
@@ -25,6 +26,7 @@ export async function POST(req: Request) {
 
   const email = (body.email || "").trim().toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || email.length > 200) return json({ error: "invalid_email" }, 400);
+  if (isPersonalEmail(email)) return json({ error: "personal_email" }, 400);
   const role = ["founder", "marketing", "agency", "other"].includes(body.role || "") ? (body.role as string) : "other";
   const score = fitScore(p, role);
   await saveLead({
