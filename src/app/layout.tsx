@@ -1,6 +1,16 @@
 import type { Metadata } from "next";
+// Webflow DevLink styles, imported one by one: Next mangles the
+// "@import ... layer()" lines in webflow/css/global.css.
+import "webflow/css/fonts.css";
+import "webflow/css/normalize.css";
+import "webflow/css/defaults.css";
+import "webflow/css/variables.css";
+import "webflow/css/tags.css";
+import "webflow/css/classes.css";
 import "./globals.css";
-import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
+import { DevLinkProvider } from "webflow/DevLinkProvider";
+import { NavbarTransparentDrop } from "webflow/NavbarTransparentDrop";
+import { FooterUpdated } from "webflow/FooterUpdated";
 
 export const metadata: Metadata = {
   title: "Free Ecommerce Marketing Strategy Generator | Cavaco",
@@ -17,13 +27,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
         />
       </head>
       <body>
-        <SiteHeader />
-        {children}
-        <SiteFooter />
+        <DevLinkProvider>
+          {/* The site navbar is transparent and absolutely positioned (it sits over a dark hero on cavaco.ai). */}
+          <div className="wf-nav-band">
+            <NavbarTransparentDrop />
+          </div>
+          {children}
+          <div className="wf-footer">
+            <FooterUpdated />
+          </div>
+        </DevLinkProvider>
       </body>
     </html>
   );

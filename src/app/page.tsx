@@ -48,7 +48,7 @@ function Preview() {
           {MONTHS.map((_, i) => (
             <span key={i} style={{ display: "flex", justifyContent: "center", alignItems: "center", height: 14 }}>
               {DOTS[i] ? (
-                <span style={{ width: DOTS[i] === "big" ? 12 : 8, height: DOTS[i] === "big" ? 12 : 8, borderRadius: 999, background: DOTS[i] === "big" ? "var(--blue)" : "#b5d5f1", display: "block" }} />
+                <span style={{ width: DOTS[i] === "big" ? 12 : 8, height: DOTS[i] === "big" ? 12 : 8, borderRadius: 999, background: DOTS[i] === "big" ? "var(--blue)" : "var(--tint-2)", display: "block" }} />
               ) : null}
             </span>
           ))}
@@ -71,7 +71,7 @@ function Preview() {
           <span style={{ flex: "6 1 0" }}>Close</span>
         </div>
         <div className="row gap-8">{tile("12 + 4", "Emails + SMS")}{tile("36", "Social posts")}{tile("$12.5k", "Ads, 8 creatives")}{tile("4", "Site changes")}</div>
-        <div className="row between center gap-8" style={{ background: "var(--navy)", color: "#fff", borderRadius: 10, padding: "10px 14px", fontSize: 13 }}>
+        <div className="row between center gap-8" style={{ background: "var(--night)", color: "#fff", borderRadius: 10, padding: "10px 14px", fontSize: 13 }}>
           <span>64 pieces ready to build</span>
           <span style={{ fontWeight: 700 }}>Open in Cavaco →</span>
         </div>

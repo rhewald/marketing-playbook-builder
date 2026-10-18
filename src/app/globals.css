@@ -1,15 +1,18 @@
 :root {
-  --navy: #121a4b;
-  --blue: #6cace4;
-  --blue-text: #2b6ca3;
-  --blue-dark: #1f5585;
-  --tint: #e6f1fb;
-  --tint-2: #cfe4f7;
-  --ground: #f4f5f7;
-  --line: #e2e5ea;
-  --line-soft: #eef0f3;
-  --muted: #4a5160;
-  --quiet: #5b6270;
+  /* Matches the cavaco.ai Webflow theme */
+  --navy: #131313;        /* primary text and buttons */
+  --night: #09102c;       /* dark sections */
+  --blue: #56eb83;        /* brand green accent */
+  --blue-text: #17783f;   /* accent for text on light backgrounds */
+  --blue-dark: #11602f;
+  --tint: #e8fbef;
+  --tint-2: #c7f4d7;
+  --lime: #d6fd70;
+  --ground: #f7f7f7;
+  --line: #e4e4e4;
+  --line-soft: #efefef;
+  --muted: #3f3f3f;
+  --quiet: #505050;
   --warn: #8f3e15;
   --warn-bg: #fbe9df;
   --ok: #1f7a4d;
@@ -19,13 +22,14 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 body {
-  font-family: "Bariol", "Poppins", system-ui, sans-serif;
+  font-family: Inter, system-ui, sans-serif;
+  letter-spacing: -0.01em;
   color: var(--navy);
   background: var(--ground);
   -webkit-font-smoothing: antialiased;
 }
 a { color: var(--blue-text); }
-a:hover { color: #1d4f7a; }
+a:hover { color: var(--blue-dark); }
 img { max-width: 100%; }
 h1, h2, h3, h4 { margin: 0; line-height: 1.15; }
 p { margin: 0; }
@@ -44,13 +48,14 @@ p { margin: 0; }
 .center { align-items: center; }
 
 /* Buttons */
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 12px 20px; border-radius: 10px; font: inherit; font-weight: 700; font-size: 16px; text-decoration: none; cursor: pointer; border: 1px solid transparent; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 12px 24px; border-radius: 999px; font: inherit; font-weight: 700; font-size: 16px; text-decoration: none; cursor: pointer; border: 1px solid transparent; }
 .btn-primary { background: var(--navy); color: #fff; }
-.btn-primary:hover { background: #1c2766; color: #fff; }
+.btn-primary:hover { background: #2a2a2a; color: #fff; }
 .btn-primary:disabled { opacity: .6; cursor: default; }
 .btn-light { background: #fff; color: var(--navy); border-color: #c9cfd8; }
 .btn-light:hover { color: var(--navy); border-color: var(--navy); }
-.btn-white { background: #fff; color: var(--navy); }
+.btn-white { background: var(--blue); color: #131313; }
+.btn-white:hover { background: var(--lime); color: #131313; }
 
 /* Tags */
 .tag { display: inline-block; font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: .02em; padding: 2px 7px; border-radius: 999px; white-space: nowrap; vertical-align: middle; }
@@ -90,14 +95,14 @@ legend { padding: 0; font-size: 17px; font-weight: 700; margin-bottom: 10px; }
 .error { color: var(--warn); font-size: 14px; }
 
 /* Landing */
-.hero { padding: 64px 0 48px; }
-.hero h1 { font-size: clamp(36px, 5vw, 52px); letter-spacing: -.02em; }
+.hero { padding-top: 64px; padding-bottom: 48px; }
+.hero h1 { font-size: clamp(36px, 5vw, 56px); letter-spacing: -.03em; font-weight: 600; }
 .hero .lead { font-size: 19px; line-height: 1.5; color: var(--muted); }
 .eyebrow { font-family: var(--mono); font-size: 13px; color: var(--blue-text); font-weight: 500; }
 .band { background: #fff; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.dark { background: var(--navy); color: #fff; }
+.dark { background: var(--night); color: #fff; }
 .dark .sub { color: #d5dae2; }
-section.pad { padding: 56px 0; }
+section.pad { padding-top: 56px; padding-bottom: 56px; }
 .big-num { font-family: var(--mono); font-size: 26px; font-weight: 500; }
 
 /* Preview */
@@ -116,7 +121,7 @@ section.pad { padding: 56px 0; }
 .steps { list-style: none; margin: 0; padding: 0; background: #fff; border: 1px solid var(--line); border-radius: 12px; }
 .steps li { display: flex; gap: 14px; align-items: flex-start; padding: 16px 20px; border-bottom: 1px solid var(--line-soft); }
 .steps li:last-child { border-bottom: 0; }
-.steps li.active { background: #f3f8fd; }
+.steps li.active { background: var(--tint); }
 .spin { animation: spin 1s linear infinite; transform-origin: 50% 50%; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -131,12 +136,12 @@ table.t td { padding: 10px 12px; border-bottom: 1px solid var(--line-soft); vert
 .seg { flex: 1 1 220px; border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 6px; background: #fff; }
 .tier { border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 6px; background: var(--ground); flex: 1 1 240px; }
 .tier.main { background: var(--tint); flex: 2 1 320px; }
-.phase { flex: 1 1 200px; border-top: 4px solid #b5d5f1; padding-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+.phase { flex: 1 1 200px; border-top: 4px solid var(--tint-2); padding-top: 12px; display: flex; flex-direction: column; gap: 6px; }
 .phase.peak { border-top-color: var(--blue); }
 .warnbox { border: 1px solid #e8b79c; background: #fff9f5; }
 .listline { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line-soft); font-size: 14px; }
 .listline:last-child { border-bottom: 0; }
-.cta-band { background: var(--navy); color: #fff; border-radius: 16px; padding: 36px; display: flex; flex-wrap: wrap; gap: 28px; align-items: center; justify-content: space-between; }
+.cta-band { background: var(--night); color: #fff; border-radius: 16px; padding: 36px; display: flex; flex-wrap: wrap; gap: 28px; align-items: center; justify-content: space-between; }
 .cta-band .sub { color: #d5dae2; }
 .legend { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 13px; color: var(--quiet); }
 
@@ -146,4 +151,14 @@ table.t td { padding: 10px 12px; border-bottom: 1px solid var(--line-soft); vert
   .site-header, .site-footer, .toolbar, .no-print { display: none !important; }
   body { background: #fff; }
   .card { break-inside: avoid; }
+}
+
+/* Dark band behind the transparent cavaco.ai navbar (DevLink component) */
+.wf-nav-band { position: relative; background: var(--night); min-height: 152px; overflow-x: clip; }
+@media (max-width: 991px) { .wf-nav-band { min-height: 130px; } }
+@media print { .wf-nav-band, .wf-footer { display: none !important; } }
+.wf-footer { margin-top: 56px; }
+@media (max-width: 479px) {
+  .wf-nav-band .navbar_logo-link-2 { max-width: 128px; padding-right: 0; }
+  .wf-nav-band .navbar_logo-2.nav-bar-big { width: 120px; height: auto; }
 }

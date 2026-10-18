@@ -4,11 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/patch-devlink.mjs",
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test:rules": "tsx scripts/run-store.ts",
-    "cf-typegen": "wrangler types"
+    "cf-typegen": "wrangler types",
+    "postinstall": "node scripts/patch-devlink.mjs"
   },
   "dependencies": {
     "@opennextjs/cloudflare": "1.20.12",
