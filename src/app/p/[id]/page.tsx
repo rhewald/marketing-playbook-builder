@@ -7,7 +7,7 @@ import { BASE } from "@/lib/base";
 import { platformLabel as labelFor } from "@/lib/platform";
 import { ToolBar } from "@/components/SiteChrome";
 import type { Provenance } from "@/lib/types";
-import { CtaButton, LeadGate, ShareButton } from "./Client";
+import { CtaButton, Downloads, ShareButton } from "./Client";
 
 export const dynamic = "force-dynamic";
 
@@ -354,7 +354,7 @@ export default async function PlaybookPage({ params }: { params: Promise<{ id: s
         </section>
 
         <section id="save" className="card no-print" aria-label="Save your playbook">
-          <LeadGate playbookId={p.id} month={m.label} />
+          <Downloads playbookId={p.id} />
         </section>
 
         <p className="quiet" style={{ fontSize: 13 }}>
