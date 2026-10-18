@@ -28,7 +28,7 @@ export default async function Stats({ searchParams }: { searchParams: Promise<{ 
         <span className="k">Marketing Playbook Builder · last {days} days</span>
         <h1 style={{ fontSize: 30 }}>Funnel</h1>
         <span className="quiet" style={{ fontSize: 14 }}>
-          Counts only, no personal data. Change the window with <span className="mono">?days=30</span>. Failed HubSpot syncs: {s.totals.hubspot_fail || 0}.
+          Counts only, no personal data. Change the window with <span className="mono">?days=30</span>. Failed HubSpot syncs: {s.totals.hubspot_fail || 0}. Test leads (not sent to HubSpot): {s.totals.lead_test || 0}.
         </span>
       </div>
       <div className="card stack gap-8">

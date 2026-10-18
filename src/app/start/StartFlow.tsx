@@ -2,9 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { BASE } from "@/lib/base";
+import { BASE, SITE } from "@/lib/base";
 import { collectInBrowser } from "@/lib/clientScan";
 import { platformLabel } from "@/lib/platform";
+import { isPersonalEmail, WORK_EMAIL_MESSAGE } from "@/lib/workEmail";
 import type { Answers, ScanResult, SegmentCandidate } from "@/lib/types";
 import { ToolBar } from "@/components/SiteChrome";
 
@@ -71,6 +72,8 @@ export default function StartFlow() {
   const [ads, setAds] = useState<Answers["adBudget"] | "">("");
   const [offer, setOffer] = useState("");
   const [offerUndecided, setOfferUndecided] = useState(false);
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState("");
   const [buildStep, setBuildStep] = useState(0);
   const started = useRef(false);
 
@@ -118,7 +121,11 @@ export default function StartFlow() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!scan || !rev || !growth || !disc || !ads) return;
+    if (!scan || !rev || !growth || !disc || !ads || !email || !role) return;
+    if (isPersonalEmail(email)) {
+      setError(WORK_EMAIL_MESSAGE);
+      return;
+    }
     let segment: SegmentCandidate;
     let prov: "AI" | "YOU" = "AI";
     if (isCustom) {
@@ -139,11 +146,19 @@ export default function StartFlow() {
     setBuildStep(2);
     const timer = setInterval(() => setBuildStep((s) => Math.min(s + 1, 4)), 2500);
     try {
-      const res = await fetch(`${BASE}/api/playbook`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ scan, answers, segment, segmentProvenance: prov }) });
+      const res = await fetch(`${BASE}/api/playbook`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ scan, answers, segment, segmentProvenance: prov, lead: { email, role, hutk: document.cookie.match(/(?:^|; )hubspotutk=([^;]+)/)?.[1] ?? null } }) });
       const data = await res.json();
       clearInterval(timer);
       if (!res.ok || !data.id) {
-        setError(data.error === "rate_limited" ? "You've built a lot of playbooks in the last hour. Try again a bit later." : "We couldn't build the playbook. Please try again.");
+        setError(
+          data.error === "rate_limited"
+            ? "You've built a lot of playbooks in the last hour. Try again a bit later."
+            : data.error === "personal_email"
+              ? WORK_EMAIL_MESSAGE
+              : data.error === "invalid_email"
+                ? "Please enter a valid work email."
+                : "We couldn't build the playbook. Please try again."
+        );
         setPhase("intake");
         return;
       }
@@ -325,9 +340,32 @@ export default function StartFlow() {
               Not decided yet; we&apos;ll leave it open, not guess
             </label>
           </div>
+          <fieldset className="card stack gap-12">
+            <legend style={{ padding: "0 6px" }}>Where should we save your playbook?</legend>
+            <div className="row gap-8">
+              <label className="field" style={{ flex: "2 1 240px" }}>
+                Work email
+                <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@yourstore.com" autoComplete="email" />
+              </label>
+              <label className="field" style={{ flex: "1 1 180px" }}>
+                You are
+                <select value={role} onChange={(e) => setRole(e.target.value)} required>
+                  <option value="" disabled>Choose…</option>
+                  <option value="founder">Founder / owner</option>
+                  <option value="marketing">In-house marketer</option>
+                  <option value="agency">Agency / freelancer</option>
+                  <option value="other">Other</option>
+                </select>
+              </label>
+            </div>
+            <p className="quiet" style={{ fontSize: 13 }}>
+              Your playbook opens right away and is saved to a private link. By continuing you agree that Cavaco may email you about your playbook and Cavaco. Unsubscribe anytime. See our{" "}
+              <a href={`${SITE}/privacy-policy`} target="_blank" rel="noopener">Privacy Policy</a>.
+            </p>
+          </fieldset>
           {error ? <p className="error" role="alert">{error}</p> : null}
           <div className="row gap-16 center" style={{ paddingTop: 8, borderTop: "1px solid var(--line)" }}>
-            <button className="btn btn-primary" type="submit" disabled={!rev || !growth || !disc || !ads}>Build my playbook</button>
+            <button className="btn btn-primary" type="submit" disabled={!rev || !growth || !disc || !ads || !email || !role}>Build my playbook</button>
             <span className="quiet" style={{ fontSize: 14 }}>Takes under a minute</span>
           </div>
         </form>
