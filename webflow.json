@@ -5,6 +5,6 @@
   },
   "devlink-export": {
     "rootDir": "./webflow",
-    "components": "^(Navbar\\s+transparent drop|Footer Updated)$"
+    "components": "^(Navbar\\s*[Tt]ransparent\\s*[Dd]rop|Footer\\s*Updated)$"
   }
 }
