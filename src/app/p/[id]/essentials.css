@@ -1,0 +1,16 @@
+/* Always-on essentials status pills */
+.st { display: inline-block; font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+.st-found, .st-check { background: var(--tint); color: var(--blue-text); }
+.st-gap { background: var(--warn-bg); color: var(--warn); }
+.st-unknown, .st-no-budget { background: #eceef2; color: #4a5160; }
+.st-start-small { background: var(--lime); color: var(--navy); }
+.ess { min-width: 0; }
+.ess table.t td:first-child { min-width: 170px; }
+.ess table.t td:nth-child(2) { width: 1%; }
+@media print { .ess { break-inside: avoid; } .st { border: 1px solid currentColor; } }
+@media (max-width: 640px) {
+  .ess table.t thead { display: none; }
+  .ess table.t tr { display: block; padding: 12px 0; border-bottom: 1px solid var(--line-soft); }
+  .ess table.t td { display: block; border: 0; padding: 2px 0; width: auto !important; min-width: 0 !important; }
+  .ess table.t td:nth-child(2) { padding: 6px 0; }
+}

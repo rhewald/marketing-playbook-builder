@@ -1,5 +1,6 @@
 import { getPlaybook } from "@/lib/db";
 import { fmt } from "@/lib/calendar";
+import { buildEssentials } from "@/lib/essentials";
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +31,9 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
   rows.push([`${p.month.label}: channel`, "Social", "", ch.social.perPlatform.map((x) => `${x.platform} ${x.perWeek}/wk`).join(", ") || "No platforms found", ""]);
   rows.push([`${p.month.label}: channel`, "Paid ads", "", ch.ads.gap ? "No budget: recommended to start" : `Budget ${ch.ads.budget}, reserve ${ch.ads.reserve}, ${ch.ads.creatives} creatives`, ""]);
   for (const s of ch.site.changes) rows.push([`${p.month.label}: site`, s, "", "", ""]);
+  for (const g of buildEssentials(p))
+    for (const it of g.items)
+      rows.push([`Always-on: ${g.title}`, it.name, "", `${it.statusLabel}. ${it.note}${it.channels ? ` Channels: ${it.channels.replace(/ ✓/g, " (found)")}.` : ""}`, ""]);
   for (const cr of p.month.creative) rows.push([`${p.month.label}: creative`, cr.item, fmt(cr.due), cr.late ? "Late" : "", ""]);
   const csv = rows.map((r) => r.map(cell).join(",")).join("\n");
   return new Response(csv, {
