@@ -113,7 +113,7 @@ export default function Landing() {
           {[
             ["01", "Paste your store", "We read your products, prices and the tools you already use."],
             ["02", "Answer 6 questions", "Size, goals, discounts and budget. Only what a website can't tell us."],
-            ["03", "Get your playbook", "Download it, share it, or have Cavaco build the work for you."],
+            ["03", "Get your playbook", "Use it to guide your team or agency, or hand it to Cavaco's marketing copilot to execute."],
           ].map(([n, t, d]) => (
             <li key={n} className="card grow stack gap-8">
               <span className="mono" style={{ color: "var(--blue-text)", fontWeight: 500 }}>{n}</span>

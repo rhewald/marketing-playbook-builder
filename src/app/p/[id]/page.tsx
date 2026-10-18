@@ -344,7 +344,7 @@ export default async function PlaybookPage({ params }: { params: Promise<{ id: s
             <span className="k" style={{ color: "#b9c0cc" }}>Next step</span>
             <h2 id="h-cta" style={{ fontSize: 30 }}>Turn {m.label.split(" ")[0]}&apos;s playbook into {p.cta.piecesToBuild} ready-to-review pieces</h2>
             <span className="sub" style={{ lineHeight: 1.5 }}>
-              Cavaco creates the {ch.emailSms.emails} emails{ch.emailSms.sms ? `, ${ch.emailSms.sms} SMS` : ""}{ch.social.posts ? `, ${ch.social.posts} posts` : ""}{ch.ads.creatives ? `, ${ch.ads.creatives} ads` : ""} and {ch.site.changes.length} site changes from this playbook, in your brand voice, with a version for each {isLifecycle ? "customer stage" : p.segment.name.toLowerCase()}. You approve before anything goes live.
+              Your playbook is the brief Cavaco&apos;s copilot works from. It builds every email, post and ad in your voice, and you approve before anything goes live.
             </span>
           </div>
           <div className="stack gap-8" style={{ flex: "0 1 340px" }}>
