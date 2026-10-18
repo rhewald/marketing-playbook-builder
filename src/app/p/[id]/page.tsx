@@ -8,6 +8,7 @@ import { platformLabel as labelFor } from "@/lib/platform";
 import { ToolBar } from "@/components/SiteChrome";
 import type { Provenance } from "@/lib/types";
 import { CtaButton, Downloads, ShareButton } from "./Client";
+import { Essentials } from "./Essentials";
 
 export const dynamic = "force-dynamic";
 
@@ -199,7 +200,7 @@ export default async function PlaybookPage({ params }: { params: Promise<{ id: s
             <div className="row gap-16">
               <div className="tier main"><span className="mono" style={{ fontSize: 13, color: "var(--blue-dark)", fontWeight: 500 }}>MAIN · 60% of effort</span><span style={{ fontSize: 18, fontWeight: 700 }}>{m.campaigns.main.name}</span><span style={{ fontSize: 14, lineHeight: 1.4 }}>{m.campaigns.main.detail}</span></div>
               <div className="tier"><span className="mono quiet" style={{ fontSize: 13, fontWeight: 500 }}>SUPPORTING · 30%</span><span style={{ fontSize: 16, fontWeight: 700 }}>{m.campaigns.supporting.name}</span><span style={{ fontSize: 14, lineHeight: 1.4 }}>{m.campaigns.supporting.detail}</span></div>
-              <div className="tier"><span className="mono quiet" style={{ fontSize: 13, fontWeight: 500 }}>ALWAYS-ON · 10%</span><span style={{ fontSize: 16, fontWeight: 700 }}>{m.campaigns.alwaysOn.name}</span><span style={{ fontSize: 14, lineHeight: 1.4 }}>{m.campaigns.alwaysOn.detail}</span></div>
+              <div className="tier"><span className="mono quiet" style={{ fontSize: 13, fontWeight: 500 }}>ALWAYS-ON · 10%</span><span style={{ fontSize: 16, fontWeight: 700 }}>Always-on essentials</span><span style={{ fontSize: 14, lineHeight: 1.4 }}>{m.campaigns.alwaysOn.detail}. <a href="#essentials">Full list below</a>.</span></div>
             </div>
           </div>
 
@@ -300,6 +301,8 @@ export default async function PlaybookPage({ params }: { params: Promise<{ id: s
               {ch.site.changes.map((c) => <span key={c} style={{ fontSize: 14 }}>{c}</span>)}
             </div>
           </div>
+
+          <Essentials p={p} />
 
           <div className={`card stack gap-12${m.creativeBehind ? " warnbox" : ""}`}>
             <div className="row between gap-8"><span className="k" style={m.creativeBehind ? { color: "var(--warn)" } : undefined}>Creative you&apos;ll need{m.creativeBehind ? " · behind schedule" : ""}</span><Tag p="AI" /></div>
