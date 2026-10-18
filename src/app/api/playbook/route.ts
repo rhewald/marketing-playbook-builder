@@ -3,6 +3,7 @@ import { getEnv } from "@/lib/env";
 import { aiConfigured, playbookCopy } from "@/lib/ai";
 import { logEvent, newId, overLimit, savePlaybook } from "@/lib/db";
 import { clientIp, json } from "@/lib/http";
+import { checkLead, recordLead } from "@/lib/leads";
 import type { Answers, Provenance, ScanResult, SegmentCandidate } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -26,13 +27,22 @@ function validAnswers(a: unknown): a is Answers {
 export async function POST(req: Request) {
   const t0 = Date.now();
   const ip = clientIp(req);
-  let body: { scan?: ScanResult; answers?: unknown; segment?: SegmentCandidate; segmentProvenance?: Provenance };
+  let body: {
+    scan?: ScanResult;
+    answers?: unknown;
+    segment?: SegmentCandidate;
+    segmentProvenance?: Provenance;
+    lead?: { email?: string; role?: string; hutk?: string | null };
+  };
   try {
     body = await req.json();
   } catch {
     return json({ error: "bad_request" }, 400);
   }
   if (!body.scan || !body.segment || !validAnswers(body.answers)) return json({ error: "bad_request" }, 400);
+  // A work email is required before we build (and spend AI time on) a playbook.
+  const lead = checkLead(body.lead?.email, body.lead?.role);
+  if (!lead.ok) return json({ error: lead.error }, 400);
   if (await overLimit("playbook", ip, 20)) return json({ error: "rate_limited" }, 429);
 
   const scan = body.scan;
@@ -68,5 +78,10 @@ export async function POST(req: Request) {
 
   await savePlaybook(playbook);
   await logEvent("playbook", ip, id);
+  try {
+    await recordLead(playbook, lead.email, lead.role, body.lead?.hutk, ip);
+  } catch (e) {
+    console.log("lead_error", String(e).slice(0, 200)); // never block the playbook on lead sync
+  }
   return json({ id, aiUsed: playbook.aiUsed, ms: Date.now() - t0 });
 }

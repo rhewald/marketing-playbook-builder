@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { BASE, SITE } from "@/lib/base";
-import { isPersonalEmail, WORK_EMAIL_MESSAGE } from "@/lib/workEmail";
+import { BASE } from "@/lib/base";
 
 function track(playbookId: string, event: string) {
   try {
@@ -42,75 +41,19 @@ export function ShareButton({ playbookId }: { playbookId: string }) {
   );
 }
 
-export function LeadGate({ playbookId, month }: { playbookId: string; month: string }) {
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState("");
-  const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
-  const [msg, setMsg] = useState("");
-
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    if (isPersonalEmail(email)) {
-      setMsg(WORK_EMAIL_MESSAGE);
-      setState("error");
-      return;
-    }
-    setState("sending");
-    try {
-      const res = await fetch(`${BASE}/api/lead`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ playbookId, email, role, hutk: document.cookie.match(/(?:^|; )hubspotutk=([^;]+)/)?.[1] ?? null }) });
-      if (!res.ok) {
-        const d = await res.json().catch(() => ({}));
-        setMsg(d.error === "invalid_email" ? "Please enter a valid work email." : d.error === "personal_email" ? WORK_EMAIL_MESSAGE : "Something went wrong. Please try again.");
-        setState("error");
-        return;
-      }
-      setState("done");
-    } catch {
-      setMsg("Something went wrong. Please try again.");
-      setState("error");
-    }
-  }
-
-  if (state === "done")
-    return (
-      <div className="stack gap-12">
-        <h2 style={{ fontSize: 20 }}>Your playbook is unlocked</h2>
-        <p className="muted">Download it below. Want a fresh playbook every month, with the emails, posts, ads and site changes built for you? That&apos;s what Cavaco does, starting with a 14-day free trial.</p>
-        <div className="row gap-8">
-          <a className="btn btn-primary" href={`${BASE}/api/p/${playbookId}/csv`} onClick={() => track(playbookId, "csv")}>Download spreadsheet (CSV)</a>
-          <button type="button" className="btn btn-light" onClick={() => { track(playbookId, "print"); window.print(); }}>Save as PDF</button>
-        </div>
-      </div>
-    );
-
+export function Downloads({ playbookId }: { playbookId: string }) {
   return (
-    <form onSubmit={submit} className="row gap-24 between" style={{ alignItems: "flex-end" }}>
-      <div className="stack gap-4" style={{ flex: "1 1 320px" }}>
+    <div className="row gap-24 between" style={{ alignItems: "center" }}>
+      <div className="stack gap-4" style={{ flex: "1 1 360px" }}>
         <h2 style={{ fontSize: 20 }}>Download your playbook</h2>
-        <p className="quiet" style={{ fontSize: 14 }}>Get the spreadsheet and PDF. A new playbook every month comes with Cavaco.</p>
+        <p className="muted" style={{ fontSize: 15, lineHeight: 1.5 }}>
+          Take it to your team or agency. Want a fresh playbook every month, with the emails, posts, ads and site changes built for you? That&apos;s what Cavaco does, starting with a 14-day free trial.
+        </p>
       </div>
-      <div className="row gap-8" style={{ flex: "2 1 480px", alignItems: "flex-end" }}>
-        <label className="field" style={{ flex: "2 1 220px" }}>
-          Work email
-          <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@yourstore.com" autoComplete="email" />
-        </label>
-        <label className="field" style={{ flex: "1 1 160px" }}>
-          You are
-          <select value={role} onChange={(e) => setRole(e.target.value)} required>
-            <option value="" disabled>Choose…</option>
-            <option value="founder">Founder / owner</option>
-            <option value="marketing">In-house marketer</option>
-            <option value="agency">Agency / freelancer</option>
-            <option value="other">Other</option>
-          </select>
-        </label>
-        <button className="btn btn-primary" type="submit" disabled={state === "sending"}>{state === "sending" ? "Unlocking…" : "Get my playbook"}</button>
+      <div className="row gap-8">
+        <a className="btn btn-primary" href={`${BASE}/api/p/${playbookId}/csv`} onClick={() => track(playbookId, "csv")}>Download spreadsheet (CSV)</a>
+        <button type="button" className="btn btn-light" onClick={() => { track(playbookId, "print"); window.print(); }}>Save as PDF</button>
       </div>
-      {state === "error" ? <p className="error" role="alert" style={{ width: "100%" }}>{msg}</p> : null}
-      <p className="quiet" style={{ width: "100%", fontSize: 13 }}>
-        By continuing you agree that Cavaco may email you about your playbook and Cavaco. Unsubscribe anytime. See our{" "}
-        <a href={`${SITE}/privacy-policy`} target="_blank" rel="noopener">Privacy Policy</a>.
-      </p>
-    </form>
+    </div>
   );
 }
