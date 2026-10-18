@@ -1,5 +1,10 @@
 {
+  "siteId": "6a395af28d3548b0db50b340",
   "cloud": {
     "framework": "nextjs"
+  },
+  "devlink-export": {
+    "rootDir": "./webflow",
+    "components": "^(Navbar\\s+transparent drop|Footer Updated)$"
   }
 }
