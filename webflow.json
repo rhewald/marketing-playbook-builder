@@ -4,7 +4,6 @@
     "framework": "nextjs"
   },
   "devlink-export": {
-    "rootDir": "./webflow",
-    "components": "^(Navbar\\s*[Tt]ransparent\\s*[Dd]rop|Footer\\s*Updated)$"
+    "rootDir": "./webflow"
   }
 }
