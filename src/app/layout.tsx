@@ -12,6 +12,7 @@ import { DevLinkProvider } from "webflow/DevLinkProvider";
 import { NavbarTransparentDrop } from "webflow/NavbarTransparentDrop";
 import { FooterUpdated } from "webflow/FooterUpdated";
 
+const FAVICON = "https://cdn.prod.website-files.com/6a395af28d3548b0db50b340/6a3ab2f8902e8bec2e0e9a9f_CavacoFavicon_32x32.avif";
 const TITLE = "Free Marketing Playbook for Your Store | Cavaco";
 const DESCRIPTION =
   "Get your free marketing playbook: the strategy for your year and a detailed plan for next month across email, SMS, social, ads and your site. Built from your store in 2 minutes.";
@@ -20,6 +21,8 @@ export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
   metadataBase: new URL("https://www.cavaco.ai"),
+  // Same favicon as cavaco.ai (Webflow site asset).
+  icons: { icon: [{ url: FAVICON, type: "image/avif", sizes: "32x32" }], shortcut: FAVICON },
   openGraph: {
     title: "Your free marketing playbook",
     description: DESCRIPTION,
