@@ -12,11 +12,21 @@ import { DevLinkProvider } from "webflow/DevLinkProvider";
 import { NavbarTransparentDrop } from "webflow/NavbarTransparentDrop";
 import { FooterUpdated } from "webflow/FooterUpdated";
 
+const TITLE = "Free Marketing Playbook for Your Store | Cavaco";
+const DESCRIPTION =
+  "Get your free marketing playbook: the strategy for your year and a detailed plan for next month across email, SMS, social, ads and your site. Built from your store in 2 minutes.";
+
 export const metadata: Metadata = {
-  title: "Free Ecommerce Marketing Strategy Generator | Cavaco",
-  description:
-    "Paste your store and answer 6 questions. Get a marketing playbook: the strategy for your year and a detailed plan for this month across email, SMS, social, ads and your site.",
+  title: TITLE,
+  description: DESCRIPTION,
   metadataBase: new URL("https://www.cavaco.ai"),
+  openGraph: {
+    title: "Your free marketing playbook",
+    description: DESCRIPTION,
+    siteName: "Cavaco",
+    type: "website",
+  },
+  twitter: { card: "summary_large_image", title: "Your free marketing playbook", description: DESCRIPTION },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
