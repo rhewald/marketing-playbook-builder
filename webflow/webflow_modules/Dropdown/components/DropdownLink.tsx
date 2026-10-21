@@ -3,7 +3,7 @@ import * as React from "react";
 import { cj } from "../../utils";
 import { NavbarContext } from "../../Navbar/helpers/navbarContext";
 import Link, { LinkProps } from "../../Basic/components/Link";
-import type { Props } from "../../types";
+import type { LinkElement, Props } from "../../types";
 
 type DropdownLinkProps = Props<
   "a",
@@ -15,7 +15,7 @@ type DropdownLinkProps = Props<
 
 export type { DropdownLinkProps };
 
-const DropdownLink = React.forwardRef<HTMLAnchorElement, DropdownLinkProps>(
+const DropdownLink = React.forwardRef<LinkElement, DropdownLinkProps>(
   function DropdownLink({ className = "", ...props }, ref) {
     const { isOpen: isNavbarOpen } = React.useContext(NavbarContext);
 

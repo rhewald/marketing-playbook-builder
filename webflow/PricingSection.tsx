@@ -26,25 +26,52 @@ const _interactionsData = JSON.parse(
  * Props for {@link PricingSection}
  */
 export type PricingSectionProps = {
-  buttonArrow2Link?: {
-    href: string;
-    preload?: "prerender" | "prefetch" | "none";
-    target?: "_self" | "_blank";
-  };
+  buttonArrow2Link?:
+    | {
+        href: string;
+        preload?: "prerender" | "prefetch" | "none";
+        target?: "_self" | "_blank";
+      }
+    | {
+        popoverTarget?: string;
+        popoverTargetAction: "toggle" | "show" | "hide";
+      }
+    | {
+        modalTarget?: string;
+        modalAction: "show" | "hide";
+      };
   buttonArrow2Text?: React.ReactNode;
   buttonArrow2Variant?: "Base" | "Secondary";
-  buttonArrow3Link?: {
-    href: string;
-    preload?: "prerender" | "prefetch" | "none";
-    target?: "_self" | "_blank";
-  };
+  buttonArrow3Link?:
+    | {
+        href: string;
+        preload?: "prerender" | "prefetch" | "none";
+        target?: "_self" | "_blank";
+      }
+    | {
+        popoverTarget?: string;
+        popoverTargetAction: "toggle" | "show" | "hide";
+      }
+    | {
+        modalTarget?: string;
+        modalAction: "show" | "hide";
+      };
   buttonArrow3Text?: React.ReactNode;
   buttonArrow3Variant?: "Base" | "Secondary";
-  buttonArrowLink?: {
-    href: string;
-    preload?: "prerender" | "prefetch" | "none";
-    target?: "_self" | "_blank";
-  };
+  buttonArrowLink?:
+    | {
+        href: string;
+        preload?: "prerender" | "prefetch" | "none";
+        target?: "_self" | "_blank";
+      }
+    | {
+        popoverTarget?: string;
+        popoverTargetAction: "toggle" | "show" | "hide";
+      }
+    | {
+        modalTarget?: string;
+        modalAction: "show" | "hide";
+      };
   buttonArrowText?: React.ReactNode;
   buttonArrowVariant?: "Base" | "Secondary";
   image?: string;

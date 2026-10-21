@@ -21,11 +21,20 @@ const ix3Data = JSON.parse(
  * Props for {@link Button}
  */
 export type ButtonProps = {
-  link?: {
-    href: string;
-    preload?: "prerender" | "prefetch" | "none";
-    target?: "_self" | "_blank";
-  };
+  link?:
+    | {
+        href: string;
+        preload?: "prerender" | "prefetch" | "none";
+        target?: "_self" | "_blank";
+      }
+    | {
+        popoverTarget?: string;
+        popoverTargetAction: "toggle" | "show" | "hide";
+      }
+    | {
+        modalTarget?: string;
+        modalAction: "show" | "hide";
+      };
   text?: React.ReactNode;
   variant?: "White" | "Black" | "Nav" | "Nav Black" | "transparent" | "outline";
 };
