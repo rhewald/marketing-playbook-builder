@@ -130,6 +130,7 @@ export function FooterUpdated({
                       <FormForm
                         className={"footer-form footer-ngap foter-form-field"}
                         data-name={"Email Form"}
+                        data-wf-close-modal={false}
                         id={"email-form"}
                         method={"get"}
                         name={"email-form"}

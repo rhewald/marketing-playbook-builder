@@ -47,6 +47,7 @@ export function FormComponent({}: FormComponentProps) {
         <FormForm
           className={"form_form"}
           data-name={"Form"}
+          data-wf-close-modal={false}
           id={"wf-form-Form"}
           method={"get"}
           name={"wf-form-Form"}

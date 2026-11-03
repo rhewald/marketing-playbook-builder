@@ -46,6 +46,7 @@ export function BottomFooterForm({}: BottomFooterFormProps) {
         <FormForm
           className={"footer-form footer-ngap"}
           data-name={"Email Form"}
+          data-wf-close-modal={false}
           id={"email-form"}
           method={"get"}
           name={"email-form"}
